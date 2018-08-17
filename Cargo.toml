@@ -1,0 +1,7 @@
+[package]
+name = "Stable-Marriage"
+version = "0.1.0"
+authors = ["jwgonser <gonserj@mail.gvsu.edu>"]
+
+[dependencies]
+rand = "0.5"
