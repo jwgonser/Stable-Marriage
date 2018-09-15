@@ -1,4 +1,3 @@
-//#![feature(rustc_private)]
 extern crate rand;
 
 use std::fs::File;
@@ -9,6 +8,10 @@ use std::hash::Hasher;
 
 use rand::prelude::*;
 
+/// Trait that is used to define any user objects that need pairing.
+/// This requires the function generate_preferences() which is user
+/// defined. The function creates a preference list for every object
+/// in each list so that marry() knows how to match objects together. 
 trait MarriageItem<T> : Hash {
 
     fn generate_preferences(&self, list : Vec<T>) -> Vec<T>;
@@ -16,6 +19,10 @@ trait MarriageItem<T> : Hash {
 }
 
 #[derive(Clone)]
+/// Container that holds the objects created by the user.
+/// Contains a boolean that is used to determine if it is currently
+/// matched, the object itself, a usize that contains the current
+/// position in it's preference list, and the preference list itself.
 struct MIContainer <A : MarriageItem<B> + PartialEq, B : MarriageItem<A> + PartialEq>{
     currently_matched : bool,
     item : A,
@@ -27,12 +34,14 @@ struct MIContainer <A : MarriageItem<B> + PartialEq, B : MarriageItem<A> + Parti
 
 
 #[derive(Clone, Hash, PartialEq)]
+// object used for testing basic functionality
 struct Person {
 
     name : String,
 
 }
 
+// implementation of a basic new() function
 impl Person {
 
     fn new(name : String) -> Person {
@@ -47,6 +56,7 @@ impl Person {
 
 }
 
+// implementation of the custom generate_preferences() function
 impl MarriageItem<Person> for Person{
 
     fn generate_preferences(&self, list : Vec<Person>) -> Vec<Person>{
@@ -103,8 +113,8 @@ fn main(){
 /// This is the function that implements the Stable Marriage Algorithm.
 /// Accepts generic objects contained inside of a MIContainer (Marriage Item Container),
 /// and using a provided preference function, creates preference lists for each item in
-/// both proposers and proposees. Then, based on those generated preferences, will find one 
-/// of the most stable pairing configurations.
+/// both proposers and proposees. Then, based on those generated preferences, will find a 
+/// single (of several) stable pairing configuration.
 fn marry<A, B>(proposers : Vec<A>, proposees : Vec<B> ) -> Vec<(A,B)>
     where A:MarriageItem<B> + Clone + PartialEq,
           B:MarriageItem<A> + Clone + PartialEq{
@@ -214,7 +224,8 @@ fn marry<A, B>(proposers : Vec<A>, proposees : Vec<B> ) -> Vec<(A,B)>
     return marriage_list;
 }
 
-
+// reads in the .txt files and creates vectors with the names
+// for the lists of men and women. Used for the example in main().
 fn get_lists(filename : String) -> Vec<String> {
 
     match File::open(filename) {
